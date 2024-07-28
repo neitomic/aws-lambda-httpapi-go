@@ -8,7 +8,8 @@ This project is a getting started entry point to implement AWS API Gateway HTTP 
 # Install gonew
 go install golang.org/x/tools/cmd/gonew@latest
 
-gonew github.com/neitomic/aws-lambda-httpapi-go your.domain/api-project
+gonew github.com/neitomic/aws-lambda-httpapi-go your.domain/api-project ./api-project
+gonew github.com/neitomic/aws-lambda-httpapi-go/labmda_app your.domain/api-project/lambda_app ./api-project/lambda_app
 ```
 
 Some additional steps:
