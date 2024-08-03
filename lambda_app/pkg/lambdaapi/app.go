@@ -2,42 +2,38 @@ package lambdaapi
 
 import (
 	"context"
-	"github.com/aws/aws-lambda-go/lambda"
 	"log/slog"
+	"net/http"
+
+	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/gorilla/mux"
 )
 
 type HttpApiApp struct {
-	router router
+	router *mux.Router
 }
 
 func NewHttpApiApp() *HttpApiApp {
 	return &HttpApiApp{
-		router: router{
-			routes: make([]*route, 0),
-		},
+		router: mux.NewRouter(),
 	}
 }
+
+type Example http.Handler
 
 func (app *HttpApiApp) handler(ctx context.Context, event *HttpEvent) (*HttpResponse, error) {
 	slog.Info("handle event: %v", event)
-	route := app.router.matchRoute(event)
-	if route != nil {
-		resp, err := route.handle(ctx, event)
-		if err != nil {
-			return nil, err
-		}
-		return resp.Into(), nil
-	}
-	return NewHttpResponse().WithStatusCode(404).WithBody("Not Found", false), nil
+
+	request, _ := event.AsHttpRequest()
+	response := NewResponse()
+
+	app.router.ServeHTTP(response, request)
+
+	return response, nil
 }
 
-func (app *HttpApiApp) Register(path string, methods []string, handler HttpEventHandler) {
-	newRoute := route{
-		path:    path,
-		methods: methods,
-		handler: handler,
-	}
-	app.router.routes = append(app.router.routes, &newRoute)
+func (app *HttpApiApp) HandlerFunc(path string, handler http.HandlerFunc) {
+	app.router.HandleFunc(path, handler)
 }
 
 func (app *HttpApiApp) Start() {
