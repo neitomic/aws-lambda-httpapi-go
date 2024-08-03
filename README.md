@@ -23,3 +23,14 @@ Some additional steps:
 * `cdk diff`        compare deployed stack with current state
 * `cdk synth`       emits the synthesized CloudFormation template
 * `go test`         run unit tests
+
+
+### Run and test API locally using SAM
+
+```bash
+cdk synth --no-staging
+
+sam local start-api -t ./cdk.out/HelloWorldStack.template.json
+```
+```
+```
